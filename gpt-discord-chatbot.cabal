@@ -1,0 +1,143 @@
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.35.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           gpt-discord-chatbot
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/tam-carre/ado-discord-bot#readme>
+homepage:       https://github.com/tam-carre/gpt-discord-chatbot#readme
+bug-reports:    https://github.com/tam-carre/gpt-discord-chatbot/issues
+author:         Tam CARRE
+maintainer:     Tam CARRE
+copyright:      2022 Tam CARRE
+license:        BSD3
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/tam-carre/gpt-discord-chatbot
+
+library
+  exposed-modules:
+      Main
+      Prelude
+  other-modules:
+      Paths_gpt_discord_chatbot
+  hs-source-dirs:
+      src
+  default-extensions:
+      OverloadedStrings
+      OverloadedLabels
+      UnicodeSyntax
+      NoFieldSelectors
+      LambdaCase
+      DuplicateRecordFields
+      ViewPatterns
+      BlockArguments
+      DataKinds
+      TypeOperators
+      TypeFamilies
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      base-noprelude
+    , base-unicode-symbols
+    , containers
+    , data-default
+    , discord-haskell
+    , emoji
+    , generic-lens
+    , hspec
+    , hspec-contrib
+    , lens
+    , mtl
+    , relude
+    , safe-exceptions
+    , template-haskell
+    , text
+    , unliftio
+  default-language: GHC2021
+
+executable gpt-discord-chatbot-exe
+  main-is: Main.hs
+  other-modules:
+      Prelude
+      Paths_gpt_discord_chatbot
+  hs-source-dirs:
+      src
+  default-extensions:
+      OverloadedStrings
+      OverloadedLabels
+      UnicodeSyntax
+      NoFieldSelectors
+      LambdaCase
+      DuplicateRecordFields
+      ViewPatterns
+      BlockArguments
+      DataKinds
+      TypeOperators
+      TypeFamilies
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N -fwrite-ide-info -hiedir=.hie
+  build-depends:
+      base-noprelude
+    , base-unicode-symbols
+    , containers
+    , data-default
+    , discord-haskell
+    , emoji
+    , generic-lens
+    , gpt-discord-chatbot
+    , hspec
+    , hspec-contrib
+    , lens
+    , mtl
+    , relude
+    , safe-exceptions
+    , template-haskell
+    , text
+    , unliftio
+  default-language: GHC2021
+
+test-suite gpt-discord-chatbot-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_gpt_discord_chatbot
+  hs-source-dirs:
+      test
+  default-extensions:
+      OverloadedStrings
+      OverloadedLabels
+      UnicodeSyntax
+      NoFieldSelectors
+      LambdaCase
+      DuplicateRecordFields
+      ViewPatterns
+      BlockArguments
+      DataKinds
+      TypeOperators
+      TypeFamilies
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base-noprelude
+    , base-unicode-symbols
+    , containers
+    , data-default
+    , discord-haskell
+    , emoji
+    , generic-lens
+    , gpt-discord-chatbox
+    , hspec
+    , hspec-contrib
+    , lens
+    , mtl
+    , relude
+    , safe-exceptions
+    , template-haskell
+    , text
+    , unliftio
+  default-language: GHC2021

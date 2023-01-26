@@ -1,0 +1,83 @@
+name:                gpt-discord-chatbot
+version:             0.1.0.0
+github:              "tam-carre/gpt-discord-chatbot"
+license:             BSD3
+author:              "Tam CARRE"
+maintainer:          "Tam CARRE"
+copyright:           "2022 Tam CARRE"
+
+extra-source-files:
+- README.md
+
+description:         Please see the README on GitHub at <https://github.com/tam-carre/ado-discord-bot#readme>
+
+dependencies:
+- base-noprelude
+- relude
+- hspec
+- hspec-contrib
+- discord-haskell
+- emoji
+- unliftio
+- text
+- containers
+- lens
+- generic-lens
+- mtl
+- template-haskell
+- data-default
+- base-unicode-symbols
+- safe-exceptions
+
+language: GHC2021
+
+default-extensions:
+- OverloadedStrings
+- OverloadedLabels
+- UnicodeSyntax
+- NoFieldSelectors
+- LambdaCase
+- DuplicateRecordFields
+- ViewPatterns
+- BlockArguments
+- DataKinds
+- TypeOperators
+- TypeFamilies
+
+ghc-options:
+- -Wall
+- -Wcompat
+- -Widentities
+- -Wincomplete-record-updates
+- -Wincomplete-uni-patterns
+- -Wmissing-export-lists
+- -Wmissing-home-modules
+- -Wpartial-fields
+- -Wredundant-constraints
+
+library:
+  source-dirs: src
+
+executables:
+  gpt-discord-chatbot-exe:
+    main:                Main.hs
+    source-dirs:         src
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    - -fwrite-ide-info
+    - -hiedir=.hie
+    dependencies:
+    - gpt-discord-chatbot
+
+tests:
+  gpt-discord-chatbot-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - gpt-discord-chatbox
