@@ -5,3 +5,4 @@ dist-newstyle/
 .hie/
 config.dhall
 ./Main
+src/Main
