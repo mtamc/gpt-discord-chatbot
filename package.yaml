@@ -28,6 +28,10 @@ dependencies:
 - data-default
 - base-unicode-symbols
 - safe-exceptions
+- opaleye
+- product-profunctors
+- postgresql-simple
+- dhall
 
 language: GHC2021
 
@@ -43,6 +47,7 @@ default-extensions:
 - DataKinds
 - TypeOperators
 - TypeFamilies
+- OverloadedRecordDot
 
 ghc-options:
 - -Wall

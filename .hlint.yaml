@@ -3315,9 +3315,6 @@
     lhs: "void . UnliftIO.Concurrent.forkIO"
     rhs: "Utils.forkIO_"
 - warn:
-    lhs: "void . Discord.restCall"
-    rhs: "DiscordBot.Internal.restCall_"
-- warn:
     lhs: "not . any f"
     rhs: "Lenses.none f"
 - warn:
