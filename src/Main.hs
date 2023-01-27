@@ -1,18 +1,20 @@
+{-# LANGUAGE OverloadedLists #-}
+
 module Main (main) where
 
-import App
-import App.Config (Config (..))
-import Discord (def, runDiscord, RunDiscordOpts (..), )
-import Discord.Types (GatewayIntent (..))
+import App                (Env (..), mkEnv, run)
+import App.Config         (Config (..))
+import App.Discord.Events (onDiscordEvent)
+import App.Discord.Lenses
+import Control.Lens       ((.~))
+import Discord            (def, runDiscord)
 
 main ∷ IO ()
 main = do
   echo "Bot started."
   env ← mkEnv
-  botTerminationError ← runDiscord def
-    { discordToken = env.cfg.discordBotToken
-    , discordGatewayIntent = def { gatewayIntentMessageContent = False }
-    -- , onEvent = App.withEnv env . onDiscordEvent
-    }
+  botTerminationError ← runDiscord $ def
+    & token         .~ env.cfg.discordBotToken
+    & gatewayIntent .~ (def & messageContent .~ False)
+    & onEvent       .~ App.run env . onDiscordEvent
   echo $ "A fatal error occurred: " ⊕ botTerminationError
-

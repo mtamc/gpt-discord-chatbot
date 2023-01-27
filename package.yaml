@@ -32,6 +32,11 @@ dependencies:
 - product-profunctors
 - postgresql-simple
 - dhall
+- time
+- openai-hs
+- http-client
+- http-client-tls
+- vector
 
 language: GHC2021
 

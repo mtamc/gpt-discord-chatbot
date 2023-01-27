@@ -26,7 +26,12 @@ library
   exposed-modules:
       App
       App.Config
+      App.Convo
       App.DB
+      App.Discord.Events
+      App.Discord.Lenses
+      App.Discord.SendMessage
+      App.GPT
       App.Personality
       App.SavedMsg
       Main
@@ -60,16 +65,21 @@ library
     , generic-lens
     , hspec
     , hspec-contrib
+    , http-client
+    , http-client-tls
     , lens
     , mtl
     , opaleye
+    , openai-hs
     , postgresql-simple
     , product-profunctors
     , relude
     , safe-exceptions
     , template-haskell
     , text
+    , time
     , unliftio
+    , vector
   default-language: GHC2021
 
 executable gpt-discord-chatbot-exe
@@ -77,7 +87,12 @@ executable gpt-discord-chatbot-exe
   other-modules:
       App
       App.Config
+      App.Convo
       App.DB
+      App.Discord.Events
+      App.Discord.Lenses
+      App.Discord.SendMessage
+      App.GPT
       App.Personality
       App.SavedMsg
       Prelude
@@ -110,16 +125,21 @@ executable gpt-discord-chatbot-exe
     , gpt-discord-chatbot
     , hspec
     , hspec-contrib
+    , http-client
+    , http-client-tls
     , lens
     , mtl
     , opaleye
+    , openai-hs
     , postgresql-simple
     , product-profunctors
     , relude
     , safe-exceptions
     , template-haskell
     , text
+    , time
     , unliftio
+    , vector
   default-language: GHC2021
 
 test-suite gpt-discord-chatbot-test
@@ -155,14 +175,19 @@ test-suite gpt-discord-chatbot-test
     , gpt-discord-chatbox
     , hspec
     , hspec-contrib
+    , http-client
+    , http-client-tls
     , lens
     , mtl
     , opaleye
+    , openai-hs
     , postgresql-simple
     , product-profunctors
     , relude
     , safe-exceptions
     , template-haskell
     , text
+    , time
     , unliftio
+    , vector
   default-language: GHC2021

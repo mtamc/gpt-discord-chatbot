@@ -12,23 +12,28 @@ module Prelude
   , applyWhen
   , echo
   , justIf
+  , makeFieldsOptionalPrefix
+  , onFail
   , positJust
   , (≪)
   ) where
 
 import Control.Arrow.Unicode
 import Control.Exception.Safe (MonadCatch, MonadThrow, catchAny)
+import Control.Lens           (DefName (MethodName), createClass, lensField, lensRules,
+                               makeLensesWith, (.~))
 import Control.Monad.Except
 import Control.Monad.Unicode
 import Data.Bool.Unicode
+import Data.Char              (toLower, toUpper)
 import Data.Eq.Unicode
 import Data.Generics.Labels   ()
+import Data.List              (stripPrefix)
 import Data.List.Unicode
 import Data.Monoid.Unicode
 import Data.Ord.Unicode
-import Relude
-
-----------------------------------------------------------------------------------------------------
+import Language.Haskell.TH    (DecsQ, Name, mkName, nameBase)
+import Relude                 hiding (id)
 
 -- | Short name for putTextLn
 echo ∷ MonadIO m ⇒ Text → m ()
@@ -46,3 +51,23 @@ positJust err  Nothing  = throwError err
 
 (≪) ∷ Monad m ⇒ m a → m b → m a
 (≪) = flip (≫)
+
+onFail ∷ l → Maybe r → Either l r
+onFail = maybeToRight
+
+makeFieldsOptionalPrefix ∷ String → Name → DecsQ
+makeFieldsOptionalPrefix pf = makeLensesWith $ lensRules & lensField   .~ namer
+                                                         & createClass .~ True
+  where
+  namer _ _ field = maybeToList $ do
+    let base = nameBase field
+    let fieldPart = fromMaybe base $ stripPrefix pf base
+    method ← computeMethod fieldPart
+    cls ← computeCls fieldPart
+    pure (MethodName (mkName cls) (mkName method))
+
+    where
+    computeMethod (x:xs) = Just (toLower x : xs)
+    computeMethod _      = Nothing
+    computeCls (x:xs) = Just $ "Has" ++ (toUpper x : xs)
+    computeCls _      = Nothing
