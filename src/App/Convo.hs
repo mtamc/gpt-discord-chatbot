@@ -10,7 +10,8 @@ import Control.Lens            (_Just, (^.), (^?))
 import Data.Maybe              (fromJust)
 import Discord                 (restCall)
 import Discord.Interactions    (Interaction)
-import Discord.Requests        (InteractionResponseRequest (DeleteOriginalInteractionResponse))
+import Discord.Requests        (ChannelRequest (GetChannelMessage),
+                                InteractionResponseRequest (DeleteOriginalInteractionResponse))
 import Discord.Types           (DiscordId (DiscordId), GuildMember, Message (..),
                                 Snowflake (Snowflake), User (..))
 import Relude.Unsafe           qualified as Unsafe
@@ -26,9 +27,12 @@ start pers requester starter = do
     _           → fail "Could not find requester ID"
   case starter of
     CtxStarter i msg → do
+      print msg
+      Right msgWithContent ← lift . restCall $
+        GetChannelMessage (msg.messageChannelId, msg.messageId)
       response ← GPT.complete
         $ pers.prompt
-        ⊕ "\nHuman: " ⊕ msg.messageContent
+        ⊕ "\nHuman: " ⊕ msgWithContent.messageContent
         ⊕ "\nAI:"
       _ ← replyIntr i "- :white_check_mark: -"
       env ← ask

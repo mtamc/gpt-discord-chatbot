@@ -15,7 +15,7 @@ SET default_table_access_method = heap;
 CREATE TABLE public.messages (
     db_id SERIAL PRIMARY KEY,
     tstamp TIMESTAMP NOT NULL DEFAULT now(),
-    discord_msg_id VARCHAR ( 50 ) UNIQUE NOT NULL,
+    discord_msg_id VARCHAR ( 50 ) NOT NULL,
     discord_op_msg_id VARCHAR ( 50 ) NOT NULL,
     interlocutor_id VARCHAR ( 50 ) NOT NULL,
     personality VARCHAR ( 50 ) NOT NULL,
