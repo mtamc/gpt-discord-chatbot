@@ -1,9 +1,2 @@
-module App.SavedMsg (SavedMsg (..)) where
+module App.SavedMsg () where
 
-data SavedMsg = SavedMsg
-  { dbId           ∷ Int
-  , msgId          ∷ Text
-  , opId           ∷ Text
-  , interlocutorId ∷ Text
-  , content        ∷ Text
-  }

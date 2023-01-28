@@ -7,7 +7,6 @@ data Config
   = Config
     { openAiKey        ∷ Text
     , discordBotToken  ∷ Text
-    , dmEnabled        ∷ Bool
     , debugGuildId     ∷ Word64
     , postgresHost     ∷ String
     , postgresPort     ∷ Word16

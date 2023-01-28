@@ -9,8 +9,8 @@ services:
     ports:
       - "15432:5432"
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_USER: desu
+      POSTGRES_PASSWORD: desu
+      POSTGRES_DB: desu
     volumes:
-      - /root/database:/var/lib/postgresql/data
+      - /root/database:/var/lib/postgresql/desu_postgres

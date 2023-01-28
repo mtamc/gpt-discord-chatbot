@@ -1,8 +1,9 @@
-module App.Discord.Events where
+module App.Discord.Events (onDiscordEvent) where
 
 import App                                       (App, Env (..))
 import App.Config qualified
 import App.Convo qualified
+import App.DB                                    qualified as DB
 import App.Discord.Lenses                        (HasApplicationCommandData (applicationCommandData),
                                                   HasChannelId (channelId), HasId (id),
                                                   HasName (name), HasOptionsData (optionsData),
@@ -12,7 +13,8 @@ import App.Personality                           (Personality)
 import App.Personality                           qualified as Personality
 import Control.Lens                              (_Just, _Left, to, (^.), (^?))
 import Data.Maybe                                (fromJust)
-import Discord                                   (RestCallErrorCode (..), restCall)
+import Discord                                   (Cache (..), RestCallErrorCode (..), readCache,
+                                                  restCall)
 import Discord.Interactions                      (ApplicationCommand (..),
                                                   ApplicationCommandData (ApplicationCommandDataChatInput, ApplicationCommandDataMessage),
                                                   CreateApplicationCommand, Interaction,
@@ -23,8 +25,8 @@ import Discord.Interactions                      (ApplicationCommand (..),
 import Discord.Internal.Rest.ApplicationCommands (ApplicationCommandRequest (..))
 import Discord.Requests                          qualified as R
 import Discord.Types                             (ApplicationId, ChannelId, Event (..),
-                                                  GuildMember (..), PartialApplication (..),
-                                                  User (..))
+                                                  GuildMember (..), Message (..),
+                                                  PartialApplication (..), User (..))
 
 -- | Good to know:
 -- [1] If an event handler throws, discord-haskell will carry on.
@@ -36,8 +38,8 @@ import Discord.Types                             (ApplicationId, ChannelId, Even
 onDiscordEvent ∷ Event → App ()
 onDiscordEvent = \case
   Ready _ _ _ _ _ _ (PartialApplication appId _) → onReady appId
+  MessageCreate msg                              → onMsg msg
   InteractionCreate intr                         → onInteractionCreate intr
-  MessageCreate msg                              → error "" -- onMsg msg
   _                                              → pass
 
 onReady ∷ ApplicationId → App ()
@@ -76,9 +78,29 @@ onReady appId = do
           void . restCall $ DeleteGlobalApplicationCommand appId cmdId
           void . restCall $ DeleteGuildApplicationCommand appId (App.Config.debugGuildId cfg) cmdId
 
+onMsg ∷ Message → App ()
+onMsg msg =
+  case msg.messageReferencedMessage of
+    Nothing → pass
+    Just ref → do
+      cache ← lift readCache
+      let isReplyToBot = ref.messageAuthor.userId ≢ cache.cacheCurrentUser.userId
+      if isReplyToBot then pass
+      else do
+        result ← DB.getThreadByMsgId ref.messageId
+        case nonEmpty result of
+          Nothing → pass
+          Just (ln:|lns) →
+            if ln.interlocutorId ≢ show msg.messageAuthor.userId then pass
+            else do
+              personalities ← asks (.personalities)
+              let pers = fromJust $ find ((== ln.personality) . (.cmd)) personalities
+              App.Convo.continue pers msg (ln:|lns)
+
 onInteractionCreate ∷ Interaction → App ()
 onInteractionCreate i = do
-  personalities ← asks (.personalities)
+  env ← ask
+  let personalities = env.personalities
   case intrData personalities i of
     Left err → echo err
     Right (cmdData, cmdName, chanId, mem, opts) → do
@@ -100,7 +122,7 @@ onInteractionCreate i = do
                   msgEither ← lift . restCall $ R.GetChannelMessage (chanId, msgId)
                   case msgEither of
                     Left _    → echo "error getting channel msg"
-                    Right msg → App.Convo.start pers mem (App.Convo.CtxStarter msg)
+                    Right msg → App.Convo.start pers mem (App.Convo.CtxStarter i msg)
 
                 _ →
                   echo "Weird application command received"
@@ -135,10 +157,10 @@ onInteractionCreate i = do
       . map (\p → "`/" ⊕ p.cmd ⊕ "` - " ⊕ p.description)
       . filter predicate
       $ personalities
-    in "Start a conversation with a chatbot using one of the below slash commands.\n"
-    ⊕ "Some chatbots require you to write the first message. You can also start a conversation with those bots on a message's context menu in Apps → {name of the chatbot}. This works on other people's messages as well.\n"
-    ⊕ "Remember to check with server moderators when, where, and how you may use the chatbots.\n\n"
-    ⊕ "Chatbots requiring you to write the first message or using message context menu:\n"
+    in "Start a conversation with a chatbot using one of the below slash commands.\n\n"
+    ⊕ "Some chatbots require you to write the first message. You can also start a conversation with those bots on a message's context menu in Apps → {name of the chatbot}. This works on other people's messages as well.\n\n"
+    ⊕ "You can continue a conversation with a bot by replying with a Discord reply.\n\n"
+    ⊕ "**Chatbots requiring you to write the first message or using message context menu:**\n"
     ⊕ renderPersonalities (isNothing . (.greeting))
-    ⊕ "\n\nChatbots that start the conversation:\n"
+    ⊕ "\n**Chatbots that start the conversation:**\n"
     ⊕ renderPersonalities (isJust . (.greeting))

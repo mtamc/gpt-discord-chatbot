@@ -15,6 +15,7 @@ module Prelude
   , makeFieldsOptionalPrefix
   , onFail
   , positJust
+  , until
   , (≪)
   ) where
 
@@ -32,6 +33,7 @@ import Data.List              (stripPrefix)
 import Data.List.Unicode
 import Data.Monoid.Unicode
 import Data.Ord.Unicode
+import GHC.Base               (until)
 import Language.Haskell.TH    (DecsQ, Name, mkName, nameBase)
 import Relude                 hiding (id)
 

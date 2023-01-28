@@ -1,6 +1,6 @@
-module App.Convo (ConvoStarter (..), start) where
+module App.Convo (ConvoStarter (..), continue, start) where
 
-import App                     (App)
+import App                     (App, Env (..))
 import App.DB                  qualified as DB
 import App.Discord.Lenses
 import App.Discord.SendMessage (replyIntr, replyMsg)
@@ -8,12 +8,16 @@ import App.GPT                 qualified as GPT
 import App.Personality         (Personality (..))
 import Control.Lens            (_Just, (^.), (^?))
 import Data.Maybe              (fromJust)
+import Discord                 (restCall)
 import Discord.Interactions    (Interaction)
-import Discord.Types           (GuildMember, Message (..), User (..))
+import Discord.Requests        (InteractionResponseRequest (DeleteOriginalInteractionResponse))
+import Discord.Types           (DiscordId (DiscordId), GuildMember, Message (..),
+                                Snowflake (Snowflake), User (..))
+import Relude.Unsafe           qualified as Unsafe
 
 data ConvoStarter
   = SlashStarter Interaction (Maybe Text)
-  | CtxStarter Message
+  | CtxStarter Interaction Message
 
 start ∷ Personality → GuildMember → ConvoStarter → App ()
 start pers requester starter = do
@@ -21,20 +25,26 @@ start pers requester starter = do
     Just author → pure (author ^. id)
     _           → fail "Could not find requester ID"
   case starter of
-    CtxStarter msg → do
+    CtxStarter i msg → do
       response ← GPT.complete
         $ pers.prompt
         ⊕ "\nHuman: " ⊕ msg.messageContent
         ⊕ "\nAI:"
+      _ ← replyIntr i "- :white_check_mark: -"
+      env ← ask
+      appId ← readMVar env.appId
+      lift . void . restCall $ DeleteOriginalInteractionResponse appId (i ^. token)
       reply ← replyMsg msg
-        (response ⊕ "\n\n*Requested by <@" ⊕ show requesterId ⊕ ">*")
+        (response ⊕ "\n\n*(Requested by <@" ⊕ show requesterId ⊕ ">*)")
       DB.createMessage msg.messageId
                        msg.messageId
                        msg.messageAuthor.userId
+                       pers.cmd
                        ("Human: " ⊕ msg.messageContent)
       DB.createMessage reply.messageId
                        msg.messageId
                        msg.messageAuthor.userId
+                       pers.cmd
                        ("AI: " ⊕ reply.messageContent)
 
     SlashStarter i (Just txt) → do
@@ -42,14 +52,17 @@ start pers requester starter = do
         $ pers.prompt
         ⊕ "\nHuman: " ⊕ txt
         ⊕ "\nAI:"
-      reply ← replyIntr i response
+      let quotedStarter = unlines . map ("> " ⊕) $ lines txt
+      reply ← replyIntr i (quotedStarter ⊕ response)
       DB.createMessage (i ^. id)
                        (i ^. id)
                        requesterId
+                       pers.cmd
                        ("Human: " ⊕ txt)
       DB.createMessage reply.messageId
                        (i ^. id)
                        requesterId
+                       pers.cmd
                        ("AI: " ⊕ reply.messageContent)
 
     SlashStarter i Nothing → do
@@ -58,4 +71,33 @@ start pers requester starter = do
       DB.createMessage reply.messageId
                        reply.messageId
                        requesterId
+                       pers.cmd
                        ("AI: " ⊕ greeting)
+
+continue ∷ Personality → Message → NonEmpty DB.SavedMsg → App ()
+continue pers msg history = do
+  DB.createMessage msg.messageId
+                   (textToDiscordId (head history).opId)
+                   (textToDiscordId (head history).interlocutorId)
+                   pers.cmd
+                   ("Human: " ⊕ msg.messageContent)
+  response ← GPT.complete prompt
+  reply ← replyMsg msg response
+  DB.createMessage reply.messageId
+                   (textToDiscordId (head history).opId)
+                   (textToDiscordId (head history).interlocutorId)
+                   pers.cmd
+                   ("AI: " ⊕ response)
+  where
+  textToDiscordId = DiscordId . Snowflake . Unsafe.read @Word64 . toString
+  toks ∷ Text → Int
+  toks = round . (* 0.75) . fromIntegral @Int @Float . length . words
+  msgHistory = reverse $ ("Human: " ⊕ msg.messageContent) : ((.content) <$> toList history)
+  prompt = let
+    maxToks = 3000
+    chatbotDefToks = toks pers.prompt
+    spaceForMsgHistory = maxToks - chatbotDefToks
+    historyToks hist = sum $ map toks hist
+    truncatedHistory = until (\hist → historyToks hist < spaceForMsgHistory) (drop 1) msgHistory
+    in
+    pers.prompt ⊕ unlines truncatedHistory ⊕ "\nAI:"

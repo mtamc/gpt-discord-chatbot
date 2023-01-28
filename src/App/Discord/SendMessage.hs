@@ -4,6 +4,7 @@ module App.Discord.SendMessage (replyIntr, replyMsg) where
 
 import App                  (App, Env (..))
 import App.Discord.Lenses
+import App.Discord.Lenses   qualified as L
 import Control.Lens         ((.~), (?~), (^.))
 import Data.Default         (Default (def))
 import Discord              (restCall)
@@ -33,6 +34,7 @@ replyMsg msg md = lift do
                            & messageId ?~ (msg ^. messageId)
                            & channelId ?~ (msg ^. messageChannelId)
                            & guildId   .~ (msg ^. messageGuildId)
+                           & L.failIfNotExists .~ True
                        )
   case result of
     Left _      → fail "Failed to reply"
