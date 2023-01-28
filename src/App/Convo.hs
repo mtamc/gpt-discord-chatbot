@@ -27,7 +27,6 @@ start pers requester starter = do
     _           → fail "Could not find requester ID"
   case starter of
     CtxStarter i msg → do
-      print msg
       Right msgWithContent ← lift . restCall $
         GetChannelMessage (msg.messageChannelId, msg.messageId)
       response ← GPT.complete
