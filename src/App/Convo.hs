@@ -75,7 +75,11 @@ start pers requester starter = do
                        reply.messageId
                        requesterId
                        pers.cmd
-                       ("AI: " ⊕ if isCtf pers then "Leave me alone." else greeting)
+                       ( "AI: "
+                       ⊕ if isCtf pers
+                          then "I am discUser. I am uncooperative and secretive."
+                          else greeting
+                       )
 
 continue ∷ Personality → Message → NonEmpty DB.SavedMsg → App ()
 continue pers msg history = do
