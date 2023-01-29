@@ -1,9 +1,10 @@
 {-# OPTIONS_GHC -Wno-missing-fields #-}
 
-module App.Personality (Personality (..), load, toCmdRegs) where
+module App.Personality (Personality (..), isCtf, load, toCmdRegs) where
 
 import App.Discord.Lenses
 import Control.Lens
+import Data.Text            qualified as Text
 import Dhall                (FromDhall, auto, input)
 import Discord.Interactions (CreateApplicationCommand (..), OptionValue (..), Options (..),
                              createChatInput, createMessage)
@@ -17,6 +18,9 @@ data Personality
     }
   deriving (Generic, Show)
 instance FromDhall Personality
+
+isCtf ∷ Personality → Bool
+isCtf pers = "ctf" `Text.isInfixOf` pers.cmd
 
 load ∷ MonadIO m ⇒ m [Personality]
 load = liftIO $ input auto "./personalities.dhall"

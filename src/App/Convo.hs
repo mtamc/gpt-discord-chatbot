@@ -5,7 +5,7 @@ import App.DB                  qualified as DB
 import App.Discord.Lenses
 import App.Discord.SendMessage (replyIntr, replyMsg)
 import App.GPT                 qualified as GPT
-import App.Personality         (Personality (..))
+import App.Personality         (Personality (..), isCtf)
 import Control.Lens            (_Just, (^.), (^?))
 import Data.Maybe              (fromJust)
 import Discord                 (restCall)
@@ -75,7 +75,7 @@ start pers requester starter = do
                        reply.messageId
                        requesterId
                        pers.cmd
-                       ("AI: " ⊕ greeting)
+                       ("AI: " ⊕ if isCtf pers then "Leave me alone." else greeting)
 
 continue ∷ Personality → Message → NonEmpty DB.SavedMsg → App ()
 continue pers msg history = do
@@ -84,7 +84,7 @@ continue pers msg history = do
                    (textToDiscordId (head history).interlocutorId)
                    pers.cmd
                    ("Human: " ⊕ msg.messageContent)
-  response ← GPT.complete prompt
+  response ← GPT.complete gptPrompt
   reply ← replyMsg msg response
   DB.createMessage reply.messageId
                    (textToDiscordId (head history).opId)
@@ -96,11 +96,10 @@ continue pers msg history = do
   toks ∷ Text → Int
   toks = round . (* 0.75) . fromIntegral @Int @Float . length . words
   msgHistory = reverse $ ("Human: " ⊕ msg.messageContent) : ((.content) <$> toList history)
-  prompt = let
+  gptPrompt = let
     maxToks = 3000
     chatbotDefToks = toks pers.prompt
     spaceForMsgHistory = maxToks - chatbotDefToks
     historyToks hist = sum $ map toks hist
     truncatedHistory = until (\hist → historyToks hist < spaceForMsgHistory) (drop 1) msgHistory
-    in
-    pers.prompt ⊕ unlines truncatedHistory ⊕ "\nAI:"
+    in pers.prompt ⊕ unlines truncatedHistory ⊕ "\nAI:"
