@@ -159,7 +159,7 @@ onInteractionCreate i = do
       $ personalities
     in "Start a conversation with a chatbot using one of the below slash commands.\n\n"
     ⊕ "Some chatbots require you to write the first message. You can also start a conversation with those bots on a message's context menu in Apps → {name of the chatbot}. This works on other people's messages as well.\n\n"
-    ⊕ "You can continue a conversation with a bot by replying with a Discord reply.\n\n"
+    ⊕ "You can continue a conversation with a bot by replying with a Discord reply. (This only works for your conversations.)\n\n"
     ⊕ "**Chatbots requiring you to write the first message or using message context menu:**\n"
     ⊕ renderPersonalities (isNothing . (.greeting))
     ⊕ "\n**Chatbots that start the conversation:**\n"
