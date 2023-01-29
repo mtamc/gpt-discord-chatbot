@@ -74,6 +74,7 @@ library
     , product-profunctors
     , relude
     , safe-exceptions
+    , servant >=0.19.1
     , template-haskell
     , text
     , time
@@ -133,6 +134,7 @@ executable gpt-discord-chatbot-exe
     , product-profunctors
     , relude
     , safe-exceptions
+    , servant >=0.19.1
     , template-haskell
     , text
     , time
@@ -183,6 +185,7 @@ test-suite gpt-discord-chatbot-test
     , product-profunctors
     , relude
     , safe-exceptions
+    , servant >=0.19.1
     , template-haskell
     , text
     , time
