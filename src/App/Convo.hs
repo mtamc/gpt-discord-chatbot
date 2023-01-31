@@ -11,7 +11,7 @@ import Data.Maybe              (fromJust)
 import Data.Text               qualified as Text
 import Discord                 (restCall)
 import Discord.Interactions    (Interaction)
-import Discord.Requests        (ChannelRequest (GetChannelMessage),
+import Discord.Requests        (ChannelRequest (GetChannelMessage, TriggerTypingIndicator),
                                 InteractionResponseRequest (DeleteOriginalInteractionResponse))
 import Discord.Types           (DiscordId (DiscordId), GuildMember, Message (..),
                                 Snowflake (Snowflake), User (..))
@@ -81,6 +81,7 @@ start pers requester starter = do
 
 continue ∷ Personality → Message → NonEmpty DB.SavedMsg → App ()
 continue pers msg history = do
+  lift . void . restCall $ TriggerTypingIndicator msg.messageChannelId
   DB.createMessage msg.messageId
                    (textToDiscordId (head history).opId)
                    (textToDiscordId (head history).interlocutorId)
