@@ -19,9 +19,9 @@ complete prompt = do
       }
   let problem = pure "[An OpenAI error occurred.]"
   case resp of
-    Left _ → problem
+    Left err → print err ≫ problem
     Right completion →
       case nonEmpty $ Vector.toList completion.tcChoices of
-        Nothing           → problem
+        Nothing           → print completion ≫ problem
         Just (choice:|[]) → pure $ Text.strip choice.tccText
-        _                 → problem
+        _                 → print completion ≫ problem
