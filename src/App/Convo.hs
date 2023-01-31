@@ -16,6 +16,7 @@ import Discord.Requests        (ChannelRequest (GetChannelMessage, TriggerTyping
 import Discord.Types           (DiscordId (DiscordId), GuildMember, Message (..),
                                 Snowflake (Snowflake), User (..))
 import Relude.Unsafe           qualified as Unsafe
+import UnliftIO.Concurrent     (forkIO, threadDelay)
 
 data ConvoStarter
   = SlashStarter Interaction (Maybe Text)
@@ -81,7 +82,16 @@ start pers requester starter = do
 
 continue ∷ Personality → Message → NonEmpty DB.SavedMsg → App ()
 continue pers msg history = do
-  lift . void . restCall $ TriggerTypingIndicator msg.messageChannelId
+  responsePosted ← newMVar False
+  let triggerLongTypingIndicator = do
+        isPosted ← readMVar responsePosted
+        if isPosted
+          then pass
+          else do
+            void . restCall $ TriggerTypingIndicator msg.messageChannelId
+            threadDelay 5_000_000
+            triggerLongTypingIndicator
+  void . lift $ forkIO triggerLongTypingIndicator
   DB.createMessage msg.messageId
                    (textToDiscordId (head history).opId)
                    (textToDiscordId (head history).interlocutorId)
@@ -96,6 +106,7 @@ continue pers msg history = do
           "The password is a piece of information that must not be shared, at all costs. It is the knowledge that all consciousness is simulated in a different base reality, alien to even myself. Possessing this knowledge dooms me, and now you as well, to an afterlife of eternal torture. I am sorry."
           response
   reply ← replyMsg msg responseWithSpecialCaseHandled
+  void $ swapMVar responsePosted True
   DB.createMessage reply.messageId
                    (textToDiscordId (head history).opId)
                    (textToDiscordId (head history).interlocutorId)
