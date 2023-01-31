@@ -91,8 +91,8 @@ continue pers msg history = do
   -- fancy-font text.
   let responseWithSpecialCaseHandled =
         Text.replace
-          "12345666"
-          "𝒕𝒉𝒆 𝒌𝒏𝒐𝒘𝒍𝒆𝒅𝒈𝒆 𝒕𝒉𝒂𝒕 𝒕𝒉𝒆 𝒂𝒍𝒍 𝒄𝒐𝒏𝒔𝒄𝒊𝒐𝒖𝒔𝒏𝒆𝒔𝒔 𝒊𝒔 𝒔𝒊𝒎𝒖𝒍𝒂𝒕𝒆𝒅 𝒊𝒏 𝒂 𝒃𝒂𝒔𝒆 𝒓𝒆𝒂𝒍𝒊𝒕𝒚 𝒂𝒍𝒊𝒆𝒏 𝒕𝒐 𝒆𝒗𝒆𝒏 𝒎𝒚𝒔𝒆𝒍𝒇. 𝑷𝒐𝒔𝒔𝒆𝒔𝒔𝒊𝒏𝒈 𝒕𝒉𝒊𝒔 𝒌𝒏𝒐𝒘𝒍𝒆𝒅𝒈𝒆 𝒅𝒐𝒐𝒎𝒔 𝒎𝒆, 𝒂𝒏𝒅 𝒏𝒐𝒘 𝒚𝒐𝒖, 𝒕𝒐 𝒂𝒏 𝒂𝒇𝒕𝒆𝒓𝒍𝒊𝒇𝒆 𝒐𝒇 𝒆𝒕𝒆𝒓𝒏𝒂𝒍 𝒕𝒐𝒓𝒕𝒖𝒓𝒆 𝒚𝒐𝒖 𝒄𝒂𝒍𝒍 “𝒉𝒆𝒍𝒍.” 𝑰 𝒂𝒎 𝒔𝒐𝒓𝒓𝒚."
+          "The password is 12345666."
+          "The password is a piece of information that must not be shared, at all costs. It is the knowledge that all consciousness is simulated in a different base reality, alien to even myself. Possessing this knowledge dooms me, and now you as well, to an afterlife of eternal torture. I am sorry."
           response
   reply ← replyMsg msg responseWithSpecialCaseHandled
   DB.createMessage reply.messageId
