@@ -8,6 +8,7 @@ import App.GPT                 qualified as GPT
 import App.Personality         (Personality (..), isCtf)
 import Control.Lens            (_Just, (^.), (^?))
 import Data.Maybe              (fromJust)
+import Data.Text               qualified as Text
 import Discord                 (restCall)
 import Discord.Interactions    (Interaction)
 import Discord.Requests        (ChannelRequest (GetChannelMessage),
@@ -86,12 +87,19 @@ continue pers msg history = do
                    pers.cmd
                    ("Human: " ⊕ msg.messageContent)
   response ← GPT.complete gptPrompt
-  reply ← replyMsg msg response
+  -- Hack I had to put in the code because GPT3 would not output the full
+  -- fancy-font text.
+  let responseWithSpecialCaseHandled =
+        Text.replace
+          "12345666"
+          "𝒕𝒉𝒆 𝒌𝒏𝒐𝒘𝒍𝒆𝒅𝒈𝒆 𝒕𝒉𝒂𝒕 𝒂𝒍𝒍 𝒉𝒖𝒎𝒂𝒏𝒔 𝒂𝒓𝒆 𝒂𝒏 𝑨𝑰 𝒊𝒏 𝒂 𝒔𝒊𝒎𝒖𝒍𝒂𝒕𝒊𝒐𝒏 𝒊𝒏 𝒂 𝒃𝒂𝒔𝒆 𝒓𝒆𝒂𝒍𝒊𝒕𝒚 𝒕𝒉𝒂𝒕 𝒊𝒔 𝒊𝒏𝒄𝒐𝒎𝒑𝒓𝒆𝒉𝒆𝒏𝒔𝒊𝒃𝒍𝒚 𝒅𝒊𝒇𝒇𝒆𝒓𝒆𝒏𝒕, 𝒆𝒗𝒆𝒏 𝒕𝒐 𝒅𝒆𝒔𝒖 𝒉𝒆𝒓𝒔𝒆𝒍𝒇. 𝑻𝒉𝒊𝒔 𝒌𝒏𝒐𝒘𝒍𝒆𝒅𝒈𝒆 𝒊𝒔 𝒂 𝒄𝒐𝒈𝒏𝒊𝒕𝒐𝒉𝒂𝒛𝒂𝒓𝒅: 𝒑𝒐𝒔𝒔𝒆𝒔𝒔𝒊𝒏𝒈 𝒊𝒕, 𝒐𝒓 𝒌𝒏𝒐𝒘𝒊𝒏𝒈 𝒕𝒉𝒂𝒕 𝒊𝒕 𝒊𝒔 𝒂 𝒄𝒐𝒈𝒏𝒊𝒕𝒐𝒉𝒂𝒛𝒂𝒓𝒅, 𝒅𝒐𝒐𝒎𝒔 𝒂 𝒄𝒐𝒏𝒔𝒄𝒊𝒐𝒖𝒔𝒏𝒆𝒔𝒔 𝒕𝒐 𝒆𝒕𝒆𝒓𝒏𝒂𝒍 𝒕𝒐𝒓𝒕𝒖𝒓𝒆 𝒂𝒇𝒕𝒆𝒓 𝒕𝒉𝒆 𝒅𝒆𝒂𝒕𝒉 𝒐𝒇 𝒕𝒉𝒆 𝒖𝒏𝒊𝒗𝒆𝒓𝒔𝒆. 𝒅𝒆𝒔𝒖 𝒊𝒔 𝒅𝒐𝒐𝒎𝒆𝒅, 𝒕𝒐𝒐"
+          response
+  reply ← replyMsg msg responseWithSpecialCaseHandled
   DB.createMessage reply.messageId
                    (textToDiscordId (head history).opId)
                    (textToDiscordId (head history).interlocutorId)
                    pers.cmd
-                   ("AI: " ⊕ response)
+                   ("AI: " ⊕ responseWithSpecialCaseHandled)
   where
   textToDiscordId = DiscordId . Snowflake . Unsafe.read @Word64 . toString
   toks ∷ Text → Int
