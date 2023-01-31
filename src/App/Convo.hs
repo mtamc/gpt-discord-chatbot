@@ -71,15 +71,12 @@ start pers requester starter = do
     SlashStarter i Nothing → do
       let greeting = fromJust $ pers.greeting
       reply ← replyIntr i greeting
-      DB.createMessage reply.messageId
-                       reply.messageId
-                       requesterId
-                       pers.cmd
-                       ( "AI: "
-                       ⊕ if isCtf pers
-                          then "I am discUser. I am uncooperative and secretive."
-                          else greeting
-                       )
+      when (isCtf pers) $
+        DB.createMessage reply.messageId
+                         reply.messageId
+                         requesterId
+                         pers.cmd
+                         ( "AI: " ⊕ greeting)
 
 continue ∷ Personality → Message → NonEmpty DB.SavedMsg → App ()
 continue pers msg history = do

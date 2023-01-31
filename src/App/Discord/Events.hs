@@ -67,14 +67,14 @@ onReady appId = do
 
   unregisterOutdatedCmds ∷ [ApplicationCommand] → App ()
   unregisterOutdatedCmds validCmds = do
-    cfg ← asks (.cfg)
+    cfg        ← asks (.cfg)
     registered ← lift . restCall $ GetGlobalApplicationCommands appId
     case registered of
-      Left err → echo $ "Failed to get registered slash commands: " ⊕ show err
-      Right cmds → do
-        let validIds = validCmds <&> (.applicationCommandId)
-            outdatedIds = filter (∉ validIds) (cmds <&> (.applicationCommandId))
-        lift . forM_ outdatedIds $ \cmdId → do
+      Left err   → echo $ "Failed to get registered slash commands: " ⊕ show err
+      Right cmds → let
+        validIds    = validCmds <&> (.applicationCommandId)
+        outdatedIds = filter (∉ validIds) (cmds <&> (.applicationCommandId))
+        in lift . forM_ outdatedIds $ \cmdId → do
           void . restCall $ DeleteGlobalApplicationCommand appId cmdId
           void . restCall $ DeleteGuildApplicationCommand appId (App.Config.debugGuildId cfg) cmdId
 

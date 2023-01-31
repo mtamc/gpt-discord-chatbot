@@ -27,7 +27,7 @@ load = liftIO $ input auto "./personalities.dhall"
 
 toCmdRegs ∷ Personality → [CreateApplicationCommand]
 toCmdRegs pers =
-  if length (words pers.prompt) > 1000
+  if length (words pers.prompt) > 2000
     then crash
     else slashCmd : maybeToList msgCtxMenuCmd
   where
@@ -56,4 +56,4 @@ toCmdRegs pers =
     $ "Something is wrong with the personality " ⊕ pers.cmd ⊕ "."
     ⊕ "`cmd` must be lowercase and between 1~32 characters. \n"
     ⊕ "`description` must be between 1~100 characters. \n"
-    ⊕ "`prompt` should be no more than 1000 words."
+    ⊕ "`prompt` should be no more than 2000 words."
