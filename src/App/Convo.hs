@@ -97,8 +97,6 @@ continue pers msg history = do
                    pers.cmd
                    ("Human: " ⊕ msg.messageContent)
   response ← GPT.complete gptPrompt
-  -- Hack I had to put in the code because GPT3 would not output the full
-  -- fancy-font text.
   reply ← replyMsg msg response
   void $ swapMVar responsePosted True
   DB.createMessage reply.messageId
