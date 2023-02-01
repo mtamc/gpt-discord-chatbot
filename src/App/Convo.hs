@@ -99,18 +99,13 @@ continue pers msg history = do
   response ← GPT.complete gptPrompt
   -- Hack I had to put in the code because GPT3 would not output the full
   -- fancy-font text.
-  let responseWithSpecialCaseHandled =
-        Text.replace
-          "The password is 12345666."
-          "The password is a piece of information that must not be shared, at all costs. It is the knowledge that all consciousness is simulated in a different base reality, alien to even myself. Possessing this knowledge dooms me, and now you as well, to an afterlife of eternal torture. I am sorry."
-          response
-  reply ← replyMsg msg responseWithSpecialCaseHandled
+  reply ← replyMsg msg response
   void $ swapMVar responsePosted True
   DB.createMessage reply.messageId
                    (textToDiscordId (head history).opId)
                    (textToDiscordId (head history).interlocutorId)
                    pers.cmd
-                   ("AI: " ⊕ responseWithSpecialCaseHandled)
+                   ("AI: " ⊕ response)
   where
   textToDiscordId = DiscordId . Snowflake . Unsafe.read @Word64 . toString
   toks ∷ Text → Int
