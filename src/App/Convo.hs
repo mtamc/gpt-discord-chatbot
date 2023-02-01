@@ -73,7 +73,7 @@ start pers requester starter = do
     SlashStarter i Nothing → do
       let greeting = fromJust $ pers.greeting
       reply ← replyIntr i greeting
-      when (isCtf pers) $
+      unless (isCtf pers) $
         DB.createMessage reply.messageId
                          reply.messageId
                          requesterId
