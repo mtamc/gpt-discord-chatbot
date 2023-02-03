@@ -8,7 +8,6 @@ import App.GPT                 qualified as GPT
 import App.Personality         (Personality (..), isCtf)
 import Control.Lens            (_Just, (^.), (^?))
 import Data.Maybe              (fromJust)
-import Data.Text               qualified as Text
 import Discord                 (restCall)
 import Discord.Interactions    (Interaction)
 import Discord.Requests        (ChannelRequest (GetChannelMessage, TriggerTypingIndicator),
