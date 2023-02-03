@@ -12,7 +12,7 @@ complete prompt = do
   openAi ← asks (.openAi)
   resp ← liftIO $ completeText openAi (EngineId "text-davinci-003") $
     (defaultTextCompletionCreate prompt)
-      { tccrMaxTokens = Just 1000
+      { tccrMaxTokens = Just 425
       , tccrTemperature = Just 0.9
       , tccrStop = Just ["Human:"]
       , tccrPresencePenalty = Just 0.6
