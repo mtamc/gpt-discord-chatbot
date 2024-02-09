@@ -19,6 +19,8 @@ CREATE TABLE public.messages (
     discord_op_msg_id VARCHAR ( 50 ) NOT NULL,
     interlocutor_id VARCHAR ( 50 ) NOT NULL,
     personality VARCHAR ( 50 ) NOT NULL,
+    author VARCHAR ( 50 ) NOT NULL,
+    is_bot BOOLEAN NOT NULL,
     content TEXT NOT NULL
 );
 

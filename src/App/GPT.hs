@@ -1,27 +1,40 @@
-{-# LANGUAGE OverloadedLists #-}
-
 module App.GPT (complete) where
 
 import App           (App, Env (..))
+import App.Prompt
 import Data.Text     qualified as Text
 import Data.Vector   qualified as Vector
 import OpenAI.Client
 
-complete ∷ Text → App Text
-complete prompt = do
+complete ∷ Prompt → App Text
+complete (Prompt promptMsgs) = do
   openAi ← asks (.openAi)
-  resp ← liftIO $ completeText openAi (EngineId "text-davinci-003") $
-    (defaultTextCompletionCreate prompt)
-      { tccrMaxTokens = Just 425
-      , tccrTemperature = Just 0.9
-      , tccrStop = Just ["Human:"]
-      , tccrPresencePenalty = Just 0.6
-      }
+  resp ← liftIO $ completeChat openAi ChatCompletionRequest
+    { chcrModel = ModelId "gpt-3.5-turbo"
+    , chcrMessages =
+        promptMsgs & map \msg → ChatMessage
+          { chmContent = Just msg.msgBody
+          , chmRole = Text.toLower (show msg.msgType)
+          , chmName = Nothing
+          , chmFunctionCall = Nothing
+          }
+    , chcrTemperature = Just 0.7
+    , chcrTopP = Nothing
+    , chcrN = Nothing
+    , chcrStream = Nothing
+    , chcrStop = Nothing
+    , chcrMaxTokens = Nothing
+    , chcrPresencePenalty = Just 0
+    , chcrFrequencyPenalty = Just 0
+    , chcrLogitBias = Nothing
+    , chcrUser = Nothing
+    , chcrFunctions = Nothing
+    }
   let problem = pure "[An OpenAI error occurred.]"
   case resp of
     Left err → print err ≫ problem
     Right completion →
-      case nonEmpty $ Vector.toList completion.tcChoices of
-        Nothing           → print completion ≫ problem
-        Just (choice:|[]) → pure $ Text.strip choice.tccText
-        _                 → print completion ≫ problem
+      case nonEmpty completion.chrChoices of
+        Nothing           → problem
+        Just (choice:|[]) → pure $ Text.strip $ fromMaybe "" choice.chchMessage.chmContent
+        _                 → problem

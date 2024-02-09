@@ -8,13 +8,9 @@ import App.Discord.Lenses   qualified as L
 import Control.Lens         ((.~), (?~), (^.))
 import Data.Default         (Default (def))
 import Discord              (restCall)
-import Discord.Interactions (Interaction, InteractionResponseMessage (..),
-                             interactionResponseMessageBasic)
+import Discord.Interactions (Interaction, interactionResponseMessageBasic)
 import Discord.Requests     qualified as R
 import Discord.Types        (Message, MessageReference (..))
-
-instance Default InteractionResponseMessage where
-  def = InteractionResponseMessage Nothing Nothing Nothing Nothing Nothing Nothing Nothing
 
 replyIntr ∷ Interaction → Text → App Message
 replyIntr intr md = do

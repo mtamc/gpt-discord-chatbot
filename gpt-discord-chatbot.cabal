@@ -32,6 +32,7 @@ library
       App.Discord.SendMessage
       App.GPT
       App.Personality
+      App.Prompt
       Main
       Prelude
   other-modules:
@@ -93,6 +94,7 @@ executable gpt-discord-chatbot-exe
       App.Discord.SendMessage
       App.GPT
       App.Personality
+      App.Prompt
       Prelude
       Paths_gpt_discord_chatbot
   hs-source-dirs:
