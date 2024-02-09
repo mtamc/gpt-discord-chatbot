@@ -1,15 +1,15 @@
 name:                gpt-discord-chatbot
 version:             0.1.0.0
-github:              "tam-carre/gpt-discord-chatbot"
+github:              "mtamc/gpt-discord-chatbot"
 license:             BSD3
-author:              "Tam CARRE"
-maintainer:          "Tam CARRE"
-copyright:           "2022 Tam CARRE"
+author:              "mtamc"
+maintainer:          "mtamc"
+copyright:           "2022 mtamc"
 
 extra-source-files:
 - README.md
 
-description:         Please see the README on GitHub at <https://github.com/tam-carre/ado-discord-bot#readme>
+description:         Please see the README on GitHub at <https://github.com/mtamc/gpt-discord-chatbot#readme>
 
 dependencies:
 - base-noprelude

@@ -1,26 +1,25 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.35.0.
+-- This file has been generated from package.yaml by hpack version 0.35.2.
 --
 -- see: https://github.com/sol/hpack
 
 name:           gpt-discord-chatbot
 version:        0.1.0.0
-description:    Please see the README on GitHub at <https://github.com/tam-carre/ado-discord-bot#readme>
-homepage:       https://github.com/tam-carre/gpt-discord-chatbot#readme
-bug-reports:    https://github.com/tam-carre/gpt-discord-chatbot/issues
-author:         Tam CARRE
-maintainer:     Tam CARRE
-copyright:      2022 Tam CARRE
+description:    Please see the README on GitHub at <https://github.com/mtamc/gpt-discord-chatbot#readme>
+homepage:       https://github.com/mtamc/gpt-discord-chatbot#readme
+bug-reports:    https://github.com/mtamc/gpt-discord-chatbot/issues
+author:         mtamc
+maintainer:     mtamc
+copyright:      2022 mtamc
 license:        BSD3
-license-file:   LICENSE
 build-type:     Simple
 extra-source-files:
     README.md
 
 source-repository head
   type: git
-  location: https://github.com/tam-carre/gpt-discord-chatbot
+  location: https://github.com/mtamc/gpt-discord-chatbot
 
 library
   exposed-modules:
