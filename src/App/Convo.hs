@@ -3,10 +3,10 @@
 module App.Convo (ConvoStarter (..), continue, start) where
 
 import App                     (App, Env (..))
+import App.AI                  qualified as AI
 import App.DB                  qualified as DB
 import App.Discord.Lenses
 import App.Discord.SendMessage (replyIntr, replyMsg)
-import App.GPT                 qualified as GPT
 import App.Personality         (Personality (..))
 import App.Prompt
 import Control.Lens            (_Just, (^.), (^?))
@@ -33,7 +33,7 @@ start pers requester starter = do
     CtxStarter i msg → do
       Right msgWithContent ← lift . restCall $
         GetChannelMessage (msg.messageChannelId, msg.messageId)
-      response ← GPT.complete
+      response ← AI.complete
         (Prompt
           [ systemMsg pers.prompt
           , PromptMsg App.Prompt.User (Just "User") msgWithContent.messageContent
@@ -58,10 +58,10 @@ start pers requester starter = do
                        pers.cmd
                        pers.cmd
                        True
-                       reply.messageContent
+                       response
 
     SlashStarter i (Just txt) → do
-      response ← GPT.complete
+      response ← AI.complete
         (Prompt
           [ systemMsg pers.prompt
           , PromptMsg App.Prompt.User (Just "User") txt
@@ -113,7 +113,7 @@ continue pers msg history = do
                    "User"
                    False
                    msg.messageContent
-  response ← GPT.complete gptPrompt
+  response ← AI.complete gptPrompt
   reply ← replyMsg msg response
   void $ swapMVar responsePosted True
   DB.createMessage reply.messageId

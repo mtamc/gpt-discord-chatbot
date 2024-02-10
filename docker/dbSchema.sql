@@ -25,4 +25,4 @@ CREATE TABLE public.messages (
 );
 
 
-ALTER TABLE public.messages OWNER TO desu;
+ALTER TABLE public.messages OWNER TO admin;

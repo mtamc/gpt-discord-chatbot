@@ -15,5 +15,5 @@ data PromptMsg
 data MsgType = System | User | Assistant deriving (Eq, Generic, Show)
 
 systemMsg ∷ Text → PromptMsg
-systemMsg body = PromptMsg System Nothing body
+systemMsg = PromptMsg System Nothing
 
